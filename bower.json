@@ -1,0 +1,23 @@
+{
+  "name": "AnimateOnScroll",
+  "main": "AnimateOnScroll.js",
+  "homepage": "https://github.com/c4webbutveckling/AnimateOnScroll",
+  "authors": [
+    "Albert <albert@engvie.se>"
+  ],
+  "description": "JavaScript Class for easy animation on scroll & element collisions",
+  "keywords": [
+    "Animate",
+    "on",
+    "scroll"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
