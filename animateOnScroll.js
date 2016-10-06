@@ -58,8 +58,10 @@ var AnimateOnScroll = {
       return isVisible;
     },
     listenForScroll: function() {
+        ScrollHandler.initialize(AnimateOnScroll.scrollElement);
+        
         var offsets = AnimateOnScroll.offsets;
-        AnimateOnScroll.scrollElement.on('scroll', function() {
+        AnimateOnScroll.scrollElement.on('ScrollHandler-Scroll', function() {
             var $this = $(this);
             var currentScroll = $this.scrollTop();
             var collision = currentScroll + AnimateOnScroll.windowHeight;
