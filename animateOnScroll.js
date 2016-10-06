@@ -21,7 +21,7 @@ var AnimateOnScroll = {
             rotate: 0,
         };
 
-        //Let content load before loading elements
+        //Let content load before loading elements (Some element has no height at start)
         setTimeout(AnimateOnScroll.initializeElements, 400)
     },
     initializeElements: function() {
