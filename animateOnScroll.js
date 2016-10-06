@@ -1,6 +1,5 @@
 var AnimateOnScroll = {
     elements: [],
-    elementLength: 0,
     offsets: [],
     scrollElement: null,
     windowHeight: 0,
@@ -32,7 +31,6 @@ var AnimateOnScroll = {
         var $elements = $('.animateOnScroll');
         var elementLength = $elements.length;
         if (elementLength > 0) {
-            AnimateOnScroll.elementLength = elementLength;
             var $element;
             var visible;
             for (var i = 0; i < elementLength; i++) {
@@ -60,14 +58,14 @@ var AnimateOnScroll = {
     listenForScroll: function() {
         ScrollHandler.initialize(AnimateOnScroll.scrollElement);
         
-        var offsets = AnimateOnScroll.offsets;
+        var elementLength = AnimateOnScroll.offsets.length;
         AnimateOnScroll.scrollElement.on('ScrollHandler-Scroll', function() {
             var $this = $(this);
             var currentScroll = $this.scrollTop();
             var collision = currentScroll + AnimateOnScroll.windowHeight;
             var $element;
             var offset = 0;
-            for (i = 0; i < AnimateOnScroll.elementLength; i++) {
+            for (i = 0; i < elementLength; i++) {
                 offset = AnimateOnScroll.offsets[i];
                 if (collision > offset) {
                     AnimateOnScroll.prepareAnimation(AnimateOnScroll.elements[i]);
