@@ -1,4 +1,5 @@
 var AnimateOnScroll = {
+    window: null,
     elements: [],
     offsets: [],
     scrollElement: null,
@@ -9,6 +10,7 @@ var AnimateOnScroll = {
     options: {},
     initialize: function(scrollElement) {
         var $window = $(window);
+        AnimateOnScroll.window = $window;
         AnimateOnScroll.windowHeight = $window.height();
         AnimateOnScroll.windowInnerHeight = $window.innerHeight();
         AnimateOnScroll.scrollElement = scrollElement || $window;
@@ -25,6 +27,7 @@ var AnimateOnScroll = {
     },
     initializeElements: function() {
         if (!AnimateOnScroll.setElements()) return false;
+        $(document).trigger('AnimateOnScrollInitialized');
         AnimateOnScroll.listenForScroll();
     },
     setElements: function() {
@@ -116,8 +119,11 @@ var AnimateOnScroll = {
     },
     prepareAnimation: function($element) {
         var delay = $element.data('delay') || 0;
+        var noDelayBelow = $element.data('nodelaybelow') || 0;
+            noDelayBelow = parseInt(noDelayBelow);
+        var windowWidth = AnimateOnScroll.window.width();
 
-        if (delay > 0) {
+        if (delay > 0 && (noDelayBelow == 0 || windowWidth > noDelayBelow)) {
             setTimeout(function() {
                 AnimateOnScroll.runAnimation($element);
             }, delay);
