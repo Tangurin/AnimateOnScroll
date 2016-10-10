@@ -1,4 +1,5 @@
 var AnimateOnScroll = {
+    active: false,
     window: null,
     elements: [],
     offsets: [],
@@ -9,6 +10,10 @@ var AnimateOnScroll = {
     options: {},
     debug: true,
     initialize: function(scrollElement) {
+        if (AnimateOnScroll.active) {
+            return true;
+        }
+
         var $window = $(window);
         AnimateOnScroll.window = $window;
         AnimateOnScroll.windowHeight = $window.height();
@@ -24,6 +29,7 @@ var AnimateOnScroll = {
 
         //Let content load before loading elements (Some element has no height at start)
         setTimeout(AnimateOnScroll.initializeElements, 400)
+        AnimateOnScroll.active = true;
     },
     initializeElements: function() {
         if (!AnimateOnScroll.setElements()) return false;
