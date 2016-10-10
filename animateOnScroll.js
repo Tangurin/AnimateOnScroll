@@ -6,8 +6,8 @@ var AnimateOnScroll = {
     windowHeight: 0,
     windowInnerHeight: 0,
     zindex: 0,
-    debug: true,
     options: {},
+    debug: true,
     initialize: function(scrollElement) {
         var $window = $(window);
         AnimateOnScroll.window = $window;
