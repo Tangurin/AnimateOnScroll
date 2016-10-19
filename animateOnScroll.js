@@ -139,7 +139,7 @@ var AnimateOnScroll = {
         AnimateOnScroll.runAnimation($element);
     },
     runAnimation: function($element) {
-        $element.css( $element.defaultStyle );
+        $element.css( $element.defaultStyle ).addClass('animateOnScrollCompleted');
     },
     updateZindex: function() {
         return AnimateOnScroll.zindex++;
