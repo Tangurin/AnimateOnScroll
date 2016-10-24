@@ -32,9 +32,11 @@ var AnimateOnScroll = {
         AnimateOnScroll.active = true;
     },
     initializeElements: function() {
-        if (!AnimateOnScroll.setElements()) return false;
+        if (AnimateOnScroll.setElements()) {
+            AnimateOnScroll.listenForScroll();
+        }
+        return false;
         $(document).trigger('AnimateOnScrollInitialized');
-        AnimateOnScroll.listenForScroll();
     },
     setElements: function() {
         var $elements = $('.animateOnScroll');
