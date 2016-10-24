@@ -157,10 +157,10 @@ $(function() {
     //Load lazyload before AnimateScroll to get all element offsets
     if (typeof LazyLoad != 'undefined') {
         $(document).on('LazyLoadInitialized', function() {
-            AnimateOnScroll.initialize($('#slidebarMainContent'));
+            AnimateOnScroll.initialize($('.slidebarMainContent'));
         });
         return true;
     }
 
-    AnimateOnScroll.initialize($('#slidebarMainContent'));
+    AnimateOnScroll.initialize($('.slidebarMainContent'));
 });
