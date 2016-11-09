@@ -6,7 +6,7 @@ var AnimateOnScroll = {
     scrollElement: null,
     windowHeight: 0,
     windowInnerHeight: 0,
-    zindex: 0,
+    zindex: 1,
     options: {},
     debug: true,
     initialize: function(scrollElement) {
@@ -32,9 +32,10 @@ var AnimateOnScroll = {
         AnimateOnScroll.active = true;
     },
     initializeElements: function() {
-        if (!AnimateOnScroll.setElements()) return false;
+        if (AnimateOnScroll.setElements()) {
+            AnimateOnScroll.listenForScroll();
+        }
         $(document).trigger('AnimateOnScrollInitialized');
-        AnimateOnScroll.listenForScroll();
     },
     setElements: function() {
         var $elements = $('.animateOnScroll');
@@ -104,12 +105,9 @@ var AnimateOnScroll = {
     },
     setElementStyles: function($element) {
         var speed = $element.data('speed') || 400;
-        var style = {
-            'position': 'relative',
-            'zindex': AnimateOnScroll.updateZindex,
-        };
 
         var options = AnimateOnScroll.options;
+        var style = {};
         var defaultStyle = {};
         $.each(options, function(option, defaultValue) {
             if (typeof $element.data(option) != 'undefined') {
@@ -139,6 +137,7 @@ var AnimateOnScroll = {
         AnimateOnScroll.runAnimation($element);
     },
     runAnimation: function($element) {
+        $.extend($element.defaultStyle, {'z-index': AnimateOnScroll.updateZindex()})
         $element.css( $element.defaultStyle ).addClass('animateOnScrollCompleted');
     },
     updateZindex: function() {
