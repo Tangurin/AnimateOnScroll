@@ -54,6 +54,8 @@ var AnimateOnScroll = {
                     AnimateOnScroll.elements[i] = $element;
                     AnimateOnScroll.offsets[i] = topOffset + elementOffset;
                     AnimateOnScroll.setElementStyles($element);
+                } else {
+                    AnimateOnScroll.setAnimatedClass($element);
                 }
             }
             return true;
@@ -70,6 +72,7 @@ var AnimateOnScroll = {
         var elementLength = AnimateOnScroll.offsets.length;
         ScrollHandler.onScroll(function($this) {
             var currentScroll = $this.scrollTop();
+            console.log(currentScroll);
             var collision = currentScroll + AnimateOnScroll.windowHeight;
             var $element;
             var offset = 0;
@@ -118,6 +121,7 @@ var AnimateOnScroll = {
         $element.css(style);
         defaultStyle.transition = 'all '+ speed +'ms';
         $element.defaultStyle = defaultStyle;
+        AnimateOnScroll.setAnimatedClass($element);
     },
     prepareAnimation: function($element) {
         var delay = $element.data('delay') || 0;
@@ -137,6 +141,9 @@ var AnimateOnScroll = {
     runAnimation: function($element) {
         $.extend($element.defaultStyle, {'z-index': AnimateOnScroll.updateZindex()})
         $element.css( $element.defaultStyle ).addClass('animateOnScrollCompleted');
+    },
+    setAnimatedClass: function($element) {
+        $element.addClass('animateOnScrollAnimated');
     },
     updateZindex: function() {
         return AnimateOnScroll.zindex++;
