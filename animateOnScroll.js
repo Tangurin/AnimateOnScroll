@@ -72,7 +72,6 @@ var AnimateOnScroll = {
         var elementLength = AnimateOnScroll.offsets.length;
         ScrollHandler.onScroll(function($this) {
             var currentScroll = $this.scrollTop();
-            console.log(currentScroll);
             var collision = currentScroll + AnimateOnScroll.windowHeight;
             var $element;
             var offset = 0;
