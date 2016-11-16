@@ -7,9 +7,12 @@ var AnimateOnScroll = {
     windowInnerHeight: 0,
     zindex: 1,
     options: {},
+    onLoadCallback: null,
     debug: true,
-    initialize: function() {
+    initialize: function(onLoadCallback) {
+        AnimateOnScroll.onLoadCallback = onLoadCallback;
         if (AnimateOnScroll.active) {
+            AnimateOnScroll.runOnLoadCallback(onLoadCallback);
             return true;
         }
 
@@ -137,6 +140,12 @@ var AnimateOnScroll = {
     },
     updateZindex: function() {
         return AnimateOnScroll.zindex++;
+    },
+    runOnLoadCallback: function(callback) {
+        var callback = typeof callback == 'function' ? callback : AnimateOnScroll.onLoadCallback;
+        if (typeof callback == 'function') {
+            callback();
+        }
     },
     debug: function(str) {
         if (AnimateOnScroll.debug) {
