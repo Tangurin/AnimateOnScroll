@@ -66,8 +66,6 @@ var AnimateOnScroll = {
       return isVisible;
     },
     listenForScroll: function() {
-        ScrollHandler.initialize(AnimateOnScroll.scrollElement);
-        
         var elementLength = AnimateOnScroll.offsets.length;
         AnimateOnScroll.scrollElement.on('ScrollHandler-Scroll', function() {
             var $this = $(this);
