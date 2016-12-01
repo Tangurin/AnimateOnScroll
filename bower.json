@@ -8,7 +8,6 @@
   "description": "JavaScript Class for easy animation on scroll & element collisions",
   "keywords": [
     "Animate",
-    "on",
     "scroll"
   ],
   "license": "MIT",
