@@ -6,6 +6,11 @@
     "Albert <albert@engvie.se>"
   ],
   "description": "JavaScript Class for easy animation on scroll & element collisions",
+  "dependencies": {
+    "jquery": ">=1.7.1",
+    "ScrollHandler": "https://github.com/Tangurin/ScrollHandler.git",
+    "ResizeHandler": "https://github.com/Tangurin/ResizeHandler.git"
+  },
   "keywords": [
     "Animate",
     "scroll"
