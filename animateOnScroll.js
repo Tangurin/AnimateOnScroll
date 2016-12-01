@@ -5,11 +5,8 @@
     ===========================*/
     var AnimateOnScroll = {
         active: false,
-        window: null,
         elements: [],
         offsets: [],
-        windowHeight: 0,
-        windowInnerHeight: 0,
         zindex: 1,
         options: {},
         onLoadCallback: null,
@@ -21,76 +18,45 @@
                 return true;
             }
 
-            var $window = $(window);
-            AnimateOnScroll.window = $window;
-            AnimateOnScroll.windowHeight = $window.height();
-            AnimateOnScroll.windowInnerHeight = $window.innerHeight();
-
             AnimateOnScroll.options = {
                 opacity: 1,
                 top: 0,
                 scale: 1,
                 rotate: 0,
             };
-
             //Let content load before loading elements (Some element has no height at start)
             setTimeout(AnimateOnScroll.initializeElements, 400)
             AnimateOnScroll.active = true;
         },
         initializeElements: function() {
-            if (AnimateOnScroll.setElements()) {
-                AnimateOnScroll.listenForScroll();
+            var $elements = $('.animateOnScroll:not(.animateOnScrollFinished)');
+            if ($elements.length > 0) {
+                var elements = [];
+                $elements.each(function() {
+                    var $element = $(this);
+                    $element.options = {
+                        removeWhenVisible: true,
+                        removeWhenAlreadyVisible: true,
+                        callbacks: {
+                            afterVisible: function($element) {
+                                AnimateOnScroll.prepareAnimation($element);
+                            },
+                            alreadyVisible: function($element) {
+                                AnimateOnScroll.setAnimatedClass($element);
+                            },
+                            notAlreadyVisible: function($element) {
+                                AnimateOnScroll.setElementStyles($element);
+                            }
+                        }
+                    };
+                    elements.push($element);
+                });
+                ScrollCollisionHandler.initialize(elements);
             }
+
             $(document).trigger('AnimateOnScrollInitialized');
         },
-        setElements: function() {
-            var $elements = $('.animateOnScroll');
-            var elementLength = $elements.length;
-            if (elementLength > 0) {
-                var $element;
-                var visible;
-                for (var i = 0; i < elementLength; i++) {
-                    $element = $($elements[i]);
-                    visible = AnimateOnScroll.isVisible($element);
-
-                    if (!visible) {
-                        var topOffset = $element.offset().top;
-                        var elementOffset = $element.data('offset') || 0;
-                        AnimateOnScroll.elements[i] = $element;
-                        AnimateOnScroll.offsets[i] = topOffset + elementOffset;
-                        AnimateOnScroll.setElementStyles($element);
-                    } else {
-                        AnimateOnScroll.setAnimatedClass($element);
-                    }
-                }
-                return true;
-            }
-            return false;
-        },
-        isVisible: function($element) {
-          var rect = $element[0].getBoundingClientRect();
-          var viewHeight = Math.max(AnimateOnScroll.windowHeight, AnimateOnScroll.windowInnerHeight);
-          var isVisible = !(rect.bottom < 0 || rect.top - viewHeight >= 0);
-          return isVisible;
-        },
-        listenForScroll: function() {
-            var elementLength = AnimateOnScroll.offsets.length;
-            ScrollHandler.onScroll(function($this) {
-                var currentScroll = $this.scrollTop();
-                var collision = currentScroll + AnimateOnScroll.windowHeight;
-                var $element;
-                var offset = 0;
-                for (var i = 0; i < elementLength; i++) {
-                    offset = AnimateOnScroll.offsets[i];
-                    if (collision > offset) {
-                        AnimateOnScroll.prepareAnimation(AnimateOnScroll.elements[i]);
-                        delete AnimateOnScroll.elements[i];
-                        delete AnimateOnScroll.offsets[i];
-                    }
-                }
-            });
-        },
-        getStyleProperty: function(option, optionValue, style) {;
+        getStyleProperty: function(option, optionValue, style) {
             var webkitTransform = style['-webkit-transform'] || '';
             var msTransform = style['-ms-transform'] || '';
             var transform = style['transform'] || '';
@@ -126,14 +92,17 @@
             defaultStyle.transition = 'all '+ speed +'ms';
             $element.defaultStyle = defaultStyle;
             AnimateOnScroll.setAnimatedClass($element);
+
+            return $element;
         },
         prepareAnimation: function($element) {
             var delay = $element.data('delay') || 0;
-            var noDelayBelow = $element.data('nodelaybelow') || 0;
-                noDelayBelow = parseInt(noDelayBelow);
-            var windowWidth = AnimateOnScroll.window.width();
+            //var noDelayBelow = $element.data('nodelaybelow') || 0;
+            //    noDelayBelow = parseInt(noDelayBelow);
+            //var windowWidth = AnimateOnScroll.window.width();
 
-            if (delay > 0 && (noDelayBelow == 0 || windowWidth > noDelayBelow)) {
+            //if (delay > 0 && (noDelayBelow == 0 || windowWidth > noDelayBelow)) {
+            if (delay > 0) {
                 setTimeout(function() {
                     AnimateOnScroll.runAnimation($element);
                 }, delay);
@@ -144,10 +113,11 @@
         },
         runAnimation: function($element) {
             $.extend($element.defaultStyle, {'z-index': AnimateOnScroll.updateZindex()})
-            $element.css( $element.defaultStyle ).addClass('animateOnScrollCompleted');
+            $element.css( $element.defaultStyle );
+            AnimateOnScroll.setAnimatedClass($element);
         },
         setAnimatedClass: function($element) {
-            $element.addClass('animateOnScrollAnimated');
+            $element.addClass('animateOnScrollFinished');
         },
         updateZindex: function() {
             return AnimateOnScroll.zindex++;
