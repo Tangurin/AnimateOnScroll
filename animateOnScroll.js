@@ -40,13 +40,13 @@
                         removeWhenAlreadyVisible: true,
                         callbacks: {
                             afterVisible: function($element) {
-                                AnimateOnScroll.prepareAnimation($element);
+                                AnimateOnScroll.initializeAnimation($element);
                             },
                             alreadyVisible: function($element) {
-                                AnimateOnScroll.setAnimatedClass($element);
+                                AnimateOnScroll.animationFinished($element);
                             },
                             notAlreadyVisible: function($element) {
-                                AnimateOnScroll.setElementStyles($element);
+                                AnimateOnScroll.prepareElement($element);
                             }
                         }
                     };
@@ -75,7 +75,7 @@
 
             return style;
         },
-        setElementStyles: function($element) {
+        prepareElement: function($element) {
             var speed = $element.data('speed') || 400;
 
             var options = AnimateOnScroll.options;
@@ -92,11 +92,11 @@
             $element.css(style);
             defaultStyle.transition = 'all '+ speed +'ms';
             $element.defaultStyle = defaultStyle;
-            AnimateOnScroll.setAnimatedClass($element);
+            AnimateOnScroll.animationFinished($element);
 
             return $element;
         },
-        prepareAnimation: function($element) {
+        initializeAnimation: function($element) {
             var delay = $element.data('delay') || 0;
             //var noDelayBelow = $element.data('nodelaybelow') || 0;
             //    noDelayBelow = parseInt(noDelayBelow);
@@ -105,22 +105,22 @@
             //if (delay > 0 && (noDelayBelow == 0 || windowWidth > noDelayBelow)) {
             if (delay > 0) {
                 setTimeout(function() {
-                    AnimateOnScroll.runAnimation($element);
+                    AnimateOnScroll.animate($element);
                 }, delay);
                 return true;
             }
 
-            AnimateOnScroll.runAnimation($element);
+            AnimateOnScroll.animate($element);
         },
-        runAnimation: function($element) {
+        animate: function($element) {
             if (typeof $element.defaultStyle == 'undefined') {
                 return false;
             }
             $.extend($element.defaultStyle, {'z-index': AnimateOnScroll.updateZindex()})
             $element.css( $element.defaultStyle );
-            AnimateOnScroll.setAnimatedClass($element);
+            AnimateOnScroll.animationFinished($element);
         },
-        setAnimatedClass: function($element) {
+        animationFinished: function($element) {
             $element.addClass('animateOnScrollFinished');
         },
         updateZindex: function() {
