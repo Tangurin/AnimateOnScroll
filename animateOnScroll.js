@@ -113,6 +113,9 @@
             AnimateOnScroll.runAnimation($element);
         },
         runAnimation: function($element) {
+            if (typeof $element.defaultStyle == 'undefined') {
+                return false;
+            }
             $.extend($element.defaultStyle, {'z-index': AnimateOnScroll.updateZindex()})
             $element.css( $element.defaultStyle );
             AnimateOnScroll.setAnimatedClass($element);
