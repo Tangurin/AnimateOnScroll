@@ -7,8 +7,17 @@
         active: false,
         elements: [],
         offsets: [],
+        defaultProperties: {
+            opacity: 1,
+            top: 0,
+            left: 0,
+            translate: 0,
+            translateX: 0,
+            translateY: 0,
+            scale: 1,
+            rotate: 0,
+        },
         zindex: 1,
-        options: {},
         onLoadCallback: null,
         debug: true,
         initialize: function(onLoadCallback) {
@@ -18,19 +27,12 @@
                 return true;
             }
 
-            AnimateOnScroll.options = {
-                opacity: 1,
-                top: 0,
-                scale: 1,
-                rotate: 0,
-            };
-
             //Let content load before loading elements (Some element has no height at start)
             setTimeout(AnimateOnScroll.initializeElements, 400)
             AnimateOnScroll.active = true;
         },
         initializeElements: function() {
-            var $elements = $('.animateOnScroll:not(.animateOnScrollFinished)');
+            var $elements = $('[data-animateonscroll]:not(.animateOnScrollFinished)');
             if ($elements.length > 0) {
                 var elements = [];
                 $elements.each(function() {
@@ -54,45 +56,119 @@
                 });
                 ScrollCollisionHandler.initialize(elements);
             }
-
-            $(document).trigger('AnimateOnScrollInitialized');
         },
-        getStyleProperty: function(option, optionValue, style) {
-            var webkitTransform = style['-webkit-transform'] || '';
-            var msTransform = style['-ms-transform'] || '';
-            var transform = style['transform'] || '';
-            if (option == 'scale' || option == 'rotate' || option == 'translate') {
-                webkitTransform += ' '+ option +'('+ optionValue +')';
-                msTransform += ' '+ option +'('+ optionValue +')';
-                transform += ' '+ option +'('+ optionValue +')';
+        setTransformProperty: function(styleProperty, $element, property, propertyValue) {
+            //Make sure we don't override current existing transforms
+            var webkitTransform = $element[styleProperty]['-webkit-transform'] || '';
+            var msTransform = $element[styleProperty]['-ms-transform'] || '';
+            var transform = $element[styleProperty]['transform'] || '';
 
-                style['-webkit-transform'] = webkitTransform;
-                style['-ms-transform'] = msTransform;
-                style['transform'] = transform;
-            } else {
-                style[option] = optionValue;
+            //Set transform values
+            webkitTransform += ' '+ property +'('+ propertyValue +')';
+            msTransform += ' '+ property +'('+ propertyValue +')';
+            transform += ' '+ property +'('+ propertyValue +')';
+
+            $element[styleProperty]['-webkit-transform'] = webkitTransform;
+            $element[styleProperty]['-ms-transform'] = msTransform;
+            $element[styleProperty]['transform'] = transform;
+        },
+        setElementStyles: function(propertyConfigurations, $element) {
+            //Get alla property settings
+            var configurations = propertyConfigurations.split('&');
+            var property;
+            var sorted = {};
+            for (i in configurations ) {
+                var configuration = configurations[i].split('=');
+                if (configuration.length != 2) {
+                    continue;
+                }
+                //If first, fetch the property type example: opacity, scale
+                if (i == 0) {
+                    //Make sure it is a valid property
+                    var defaultPropertyValue = AnimateOnScroll.defaultProperties[configuration[0]];
+                    if (typeof defaultPropertyValue == 'undefined') {
+                        return false;
+                    }
+                    //Store the current property to a variable
+                    property = configuration[0]; 
+                    
+                    //Replace with transforms to use hardware rendering
+                    property = property.replace('top', 'translateY');
+                    property = property.replace('left', 'translateX');
+                    
+                    //Set the property value
+                    sorted = {
+                        value: configuration[1]
+                    };
+                    continue;
+                }
+                //Add extra settings to the sorted array
+                sorted[configuration[0]] = configuration[1];
             }
 
-            return style;
-        },
-        prepareElement: function($element) {
-            var speed = $element.data('speed') || 400;
-
-            var options = AnimateOnScroll.options;
-            var style = {};
-            var defaultStyle = {};
-            $.each(options, function(option, defaultValue) {
-                if (typeof $element.data(option) != 'undefined') {
-                    var optionValue = $element.data(option);
-                    style = AnimateOnScroll.getStyleProperty(option, optionValue, style);
-                }
-                defaultStyle = AnimateOnScroll.getStyleProperty(option, defaultValue, defaultStyle);
+            //Store speed, easing, propertyValue with fallback values
+            var propertyValue = sorted.value;
+            var speed = sorted.speed || 400;
+            var easing = sorted.easing || 'ease';
+            
+            var transformOptions = [
+                'scale',
+                'rotate',
+                'translate',
+                'translateY',
+                'translateX',
+            ];
+            var filterTransforms = transformOptions.filter(function(str) {
+                return str == property;
             });
 
+            var transitionProperty = '';
+            if (filterTransforms.length > 0) {
+                //Set transform style to animate from
+                AnimateOnScroll.setTransformProperty('style', $element, property, propertyValue);
+                //Set transform style to animate back to
+                AnimateOnScroll.setTransformProperty('defaultStyle', $element, property, defaultPropertyValue);
+                //Store current property transition settings
+                transitionProperty = 'transform';
+            } else {
+                //Set default value to animate back to
+                $element.defaultStyle[property] = defaultPropertyValue;
+                //Set style property to animate from
+                $element.style[property] = propertyValue;
+                //Store current property transition settings
+                transitionProperty = property;
+            }
+
+            //Make sure there will be no duplicate of transition
+            if ($.inArray(transitionProperty, $element.style.transitionArray)) {
+                //Add the transition to an array
+                $element.transitionArray.push(transitionProperty +' '+ speed +'ms '+ easing);
+            }
+
+            return $element;
+        },
+        prepareElement: function($element) {
+            var configuration = $element.data('animateonscroll') || '';
+            configuration = configuration.split('|');
+            if (configuration[0] == '') {
+                return false;
+            }
+
+            $element.style = {};
+            $element.defaultStyle = {};
+            $element.transitionArray = [];
+
+            for (i in configuration) {
+                //Store the style which the element will animate from
+                style = AnimateOnScroll.setElementStyles(configuration[i], $element);
+            }
+
+            var style = $element.style;
+            //Create a transition style of all stored property transitions
+            style.transition = $element.transitionArray.join(', ');
+
+            //Set the element style in the DOM
             $element.css(style);
-            defaultStyle.transition = 'all '+ speed +'ms';
-            $element.defaultStyle = defaultStyle;
-            AnimateOnScroll.animationFinished($element);
 
             return $element;
         },
