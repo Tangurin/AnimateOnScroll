@@ -160,15 +160,14 @@
 
             for (i in configuration) {
                 //Store the style which the element will animate from
-                style = AnimateOnScroll.setElementStyles(configuration[i], $element);
+                AnimateOnScroll.setElementStyles(configuration[i], $element);
             }
 
-            var style = $element.style;
-            //Create a transition style of all stored property transitions
-            style.transition = $element.transitionArray.join(', ');
+            //Set transition
+            $element.defaultStyle.transition = $element.transitionArray.join(', ');
 
             //Set the element style in the DOM
-            $element.css(style);
+            $element.css($element.style);
 
             return $element;
         },
