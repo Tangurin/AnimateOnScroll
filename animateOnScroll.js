@@ -77,7 +77,7 @@
             var configurations = propertyConfigurations.split('&');
             var property;
             var sorted = {};
-            for (i in configurations ) {
+            for (var i in configurations ) {
                 var configuration = configurations[i].split('=');
                 if (configuration.length != 2) {
                     continue;
@@ -158,7 +158,7 @@
             $element.defaultStyle = {};
             $element.transitionArray = [];
 
-            for (i in configuration) {
+            for (var i in configuration) {
                 //Store the style which the element will animate from
                 AnimateOnScroll.setElementStyles(configuration[i], $element);
             }
