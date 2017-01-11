@@ -19,7 +19,7 @@
         },
         zindex: 1,
         onLoadCallback: null,
-        debug: true,
+        debugMode: true,
         initialize: function(onLoadCallback) {
             AnimateOnScroll.onLoadCallback = onLoadCallback;
             if (AnimateOnScroll.active) {
@@ -208,7 +208,7 @@
             }
         },
         debug: function(str) {
-            if (AnimateOnScroll.debug) {
+            if (AnimateOnScroll.debugMode) {
                 console.log(str);
             }
         }
